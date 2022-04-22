@@ -1,0 +1,243 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Post Restful API",
+    "description": "Go CRUD API Spec for Post Restful API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080/api"
+    }
+  ],
+  "paths": {
+    "/posts" : {
+      "get" : {
+        "security": [{
+          "PostAuth" : []
+        }],
+        "description": "Get all posts",
+        "summary": "Get all posts",
+        "tags": ["Posts API"],
+        "responses": {
+          "200": {
+            "description": "Success get all posts",
+            "content": {
+              "application/json" : {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code" : {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data" : {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Post"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "security": [{
+          "PostAuth" : []
+        }],
+        "description": "Create post",
+        "summary": "Create post",
+        "tags": ["Posts API"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrUpdatePost"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success create post",
+            "content": {
+              "application/json" : {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Post"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+    "/posts/{postId}" : {
+      "get": {
+        "security": [{
+          "PostAuth" : []
+        }],
+        "description": "Get post by id",
+        "summary": "Get post by id",
+        "tags": ["Posts API"],
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "Post ID",
+            "content": {},
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success get post by id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "string"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Post"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "put" : {
+        "security": [{
+          "PostAuth" : []
+        }],
+        "description": "Update post by id",
+        "summary": "Update post by id",
+        "tags": ["Posts API"],
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "Post ID",
+            "content": {},
+            "required": true
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateOrUpdatePost"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success update post by id"
+          }
+        }
+      },
+      "delete": {
+        "security": [{
+          "PostAuth" : []
+        }],
+        "description": "Delete post by id",
+        "summary": "Delete post by id",
+        "tags": ["Posts API"],
+        "parameters": [
+          {
+            "name": "postId",
+            "in": "path",
+            "description": "Post ID",
+            "content": {},
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success delete post by id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code" : {
+                      "type": "number"
+                    },
+                    "status": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "PostAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-KEY",
+        "description": "Authentication for Post API"
+      }
+    },
+    "schemas": {
+      "CreateOrUpdatePost": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "Post" : {
+        "type": "object",
+        "properties": {
+          "id" : {
+            "type": "number"
+          },
+          "title" : {
+            "type": "string"
+          },
+          "description" : {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

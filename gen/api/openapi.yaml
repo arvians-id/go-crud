@@ -1,0 +1,46 @@
+openapi: 3.0.3
+info:
+  description: Go CRUD API Spec for Post Restful API
+  title: Post Restful API
+  version: 1.0.0
+servers:
+- url: http://localhost:8080
+paths:
+  /posts:
+    get:
+      description: List all posts
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+          description: Success get all posts
+      x-accepts: application/json
+components:
+  schemas:
+    inline_response_200:
+      example:
+        code: 0.8008281904610115
+        data:
+        - id: 6.027456183070403
+        - id: 6.027456183070403
+        status: status
+      properties:
+        code:
+          type: number
+        status:
+          type: string
+        data:
+          items:
+            $ref: '#/components/schemas/inline_response_200_data'
+          type: array
+      type: object
+    inline_response_200_data:
+      example:
+        id: 6.027456183070403
+      properties:
+        id:
+          type: number
+      type: object
+
