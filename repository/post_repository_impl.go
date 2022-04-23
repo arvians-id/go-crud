@@ -19,6 +19,10 @@ func (repository PostRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []
 	sqlQuery := "SELECT * FROM posts"
 	rows, err := tx.QueryContext(ctx, sqlQuery)
 	helper.PanicIfError(err)
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		helper.PanicIfError(err)
+	}(rows)
 
 	var posts []domain.Post
 	for rows.Next() {
@@ -35,6 +39,10 @@ func (repository PostRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, p
 	sqlQuery := "SELECT * FROM posts WHERE id = ?"
 	rows, err := tx.QueryContext(ctx, sqlQuery, postId)
 	helper.PanicIfError(err)
+	defer func(rows *sql.Rows) {
+		err := rows.Close()
+		helper.PanicIfError(err)
+	}(rows)
 
 	var post domain.Post
 	if rows.Next() {
@@ -43,7 +51,7 @@ func (repository PostRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, p
 		return post, nil
 	}
 
-	return domain.Post{}, errors.New("post not found")
+	return post, errors.New("post not found")
 }
 
 func (repository PostRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, post domain.Post) domain.Post {

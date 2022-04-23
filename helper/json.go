@@ -6,8 +6,8 @@ import (
 	"net/http"
 )
 
-func ReadFromRequestBody(r *http.Request, postUpdateRequest interface{}) {
-	err := json.NewDecoder(r.Body).Decode(&postUpdateRequest)
+func ReadFromRequestBody(r *http.Request, request interface{}) {
+	err := json.NewDecoder(r.Body).Decode(request)
 	PanicIfError(err)
 }
 

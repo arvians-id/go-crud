@@ -7,7 +7,9 @@ import (
 	"github.com/julienschmidt/httprouter"
 	"go-crud/app"
 	"go-crud/controller"
+	"go-crud/exception"
 	"go-crud/helper"
+	"go-crud/middleware"
 	"go-crud/repository"
 	"go-crud/service"
 	"net/http"
@@ -30,12 +32,14 @@ func main() {
 	router.PUT("/api/posts/:postId", postController.Update)
 	router.DELETE("/api/posts/:postId", postController.Delete)
 
+	router.PanicHandler = exception.ErrorHandler
+
 	server := http.Server{
 		Addr:    "localhost:8080",
-		Handler: router,
+		Handler: middleware.NewAuthMiddleware(router),
 	}
 
-	fmt.Println("Running on localhost:8080...")
+	fmt.Println("You're Running on localhost:8080")
 	err := server.ListenAndServe()
 	helper.PanicIfError(err)
 }

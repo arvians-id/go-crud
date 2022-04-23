@@ -47,7 +47,7 @@ func (controller PostControllerImpl) FindById(w http.ResponseWriter, r *http.Req
 
 func (controller PostControllerImpl) Create(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	postCreateRequest := web.PostCreateRequest{}
-	helper.ReadFromRequestBody(r, postCreateRequest)
+	helper.ReadFromRequestBody(r, &postCreateRequest)
 
 	result := controller.PostService.Create(r.Context(), postCreateRequest)
 	response := web.WebResponse{
@@ -61,7 +61,7 @@ func (controller PostControllerImpl) Create(w http.ResponseWriter, r *http.Reque
 
 func (controller PostControllerImpl) Update(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	postUpdateRequest := web.PostUpdateRequest{}
-	helper.ReadFromRequestBody(r, postUpdateRequest)
+	helper.ReadFromRequestBody(r, &postUpdateRequest)
 
 	id, err := strconv.Atoi(params.ByName("postId"))
 	helper.PanicIfError(err)
