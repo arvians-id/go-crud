@@ -11,6 +11,10 @@ import (
 type PostRepositoryImpl struct {
 }
 
+func NewPostRepositoryImpl() PostRepository {
+	return &PostRepositoryImpl{}
+}
+
 func (repository PostRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) []domain.Post {
 	sqlQuery := "SELECT * FROM posts"
 	rows, err := tx.QueryContext(ctx, sqlQuery)
@@ -55,19 +59,16 @@ func (repository PostRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, post 
 	return post
 }
 
-func (repository PostRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, postId int) domain.Post {
-	post, err := repository.FindById(ctx, tx, postId)
-	helper.PanicIfError(err)
-
+func (repository PostRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, post domain.Post) domain.Post {
 	sqlQuery := "UPDATE posts SET title = ?, description = ? WHERE id = ?"
-	_, err = tx.ExecContext(ctx, sqlQuery, post.Title, post.Description, postId)
+	_, err := tx.ExecContext(ctx, sqlQuery, post.Title, post.Description, post.Id)
 	helper.PanicIfError(err)
 
 	return post
 }
 
-func (repository PostRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, postId int) {
+func (repository PostRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, post domain.Post) {
 	sqlQuery := "DELETE FROM posts WHERE id = ?"
-	_, err := tx.ExecContext(ctx, sqlQuery, postId)
+	_, err := tx.ExecContext(ctx, sqlQuery, post.Id)
 	helper.PanicIfError(err)
 }
