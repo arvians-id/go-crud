@@ -13,10 +13,8 @@ type PostControllerImpl struct {
 	PostService service.PostService
 }
 
-func NewPostController(postService service.PostService) PostController {
-	return &PostControllerImpl{
-		PostService: postService,
-	}
+func NewPostControllerImpl(postService service.PostService) *PostControllerImpl {
+	return &PostControllerImpl{PostService: postService}
 }
 
 func (controller PostControllerImpl) FindAll(w http.ResponseWriter, r *http.Request, params httprouter.Params) {

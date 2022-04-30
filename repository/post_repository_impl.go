@@ -11,7 +11,7 @@ import (
 type PostRepositoryImpl struct {
 }
 
-func NewPostRepositoryImpl() PostRepository {
+func NewPostRepositoryImpl() *PostRepositoryImpl {
 	return &PostRepositoryImpl{}
 }
 

@@ -16,7 +16,7 @@ type PostServiceImpl struct {
 	Validate       *validator.Validate
 }
 
-func NewPostServiceImpl(postRepository repository.PostRepository, DB *sql.DB, validate *validator.Validate) PostService {
+func NewPostServiceImpl(postRepository repository.PostRepository, DB *sql.DB, validate *validator.Validate) *PostServiceImpl {
 	return &PostServiceImpl{
 		PostRepository: postRepository,
 		DB:             DB,
