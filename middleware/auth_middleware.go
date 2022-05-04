@@ -2,7 +2,6 @@ package middleware
 
 import (
 	"go-crud/helper"
-	"go-crud/model/web"
 	"net/http"
 )
 
@@ -24,11 +23,6 @@ func (middleware *AuthMiddleware) ServeHTTP(w http.ResponseWriter, r *http.Reque
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnauthorized)
 
-		response := web.WebResponse{
-			Code:   http.StatusUnauthorized,
-			Status: "Unauthorized",
-		}
-
-		helper.WriteToResponseBody(w, response)
+		helper.WriteToResponseBody(w, http.StatusUnauthorized, nil)
 	}
 }
