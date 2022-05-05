@@ -4,8 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"github.com/go-playground/validator"
+	"go-crud/helper"
+	"go-crud/model/domain"
 	"go-crud/model/web"
 	"go-crud/repository"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService interface {
@@ -26,27 +29,113 @@ func NewUserServiceImpl(userRepository repository.UserRepository, DB *sql.DB, va
 	return &UserServiceImpl{UserRepository: userRepository, DB: DB, Validate: validate}
 }
 
-func (u UserServiceImpl) FindAll(ctx context.Context) ([]web.UserResponse, error) {
-	//TODO implement me
-	panic("implement me")
+func (service UserServiceImpl) FindAll(ctx context.Context) ([]web.UserResponse, error) {
+	tx, err := service.DB.Begin()
+	if err != nil {
+		return []web.UserResponse{}, err
+	}
+	defer helper.CommitOrRollback(tx)
+
+	users, err := service.UserRepository.FindAll(ctx, tx)
+	if err != nil {
+		return []web.UserResponse{}, err
+	}
+
+	var userResponse []web.UserResponse
+	for _, user := range users {
+		userResponse = append(userResponse, helper.ToUserResponse(user))
+	}
+
+	return userResponse, nil
 }
 
-func (u UserServiceImpl) FindById(ctx context.Context, userId int) (web.UserResponse, error) {
-	//TODO implement me
-	panic("implement me")
+func (service UserServiceImpl) FindById(ctx context.Context, userId int) (web.UserResponse, error) {
+	tx, err := service.DB.Begin()
+	if err != nil {
+		return web.UserResponse{}, err
+	}
+	defer helper.CommitOrRollback(tx)
+
+	user, err := service.UserRepository.FindById(ctx, tx, userId)
+	if err != nil {
+		return web.UserResponse{}, err
+	}
+
+	return helper.ToUserResponse(user), nil
 }
 
-func (u UserServiceImpl) Create(ctx context.Context, request web.UserCreateRequest) (web.UserResponse, error) {
-	//TODO implement me
-	panic("implement me")
+func (service UserServiceImpl) Create(ctx context.Context, request web.UserCreateRequest) (web.UserResponse, error) {
+	err := service.Validate.Struct(request)
+	if err != nil {
+		return web.UserResponse{}, err
+	}
+
+	tx, err := service.DB.Begin()
+	if err != nil {
+		return web.UserResponse{}, err
+	}
+	defer helper.CommitOrRollback(tx)
+
+	password, _ := bcrypt.GenerateFromPassword([]byte(request.Password), bcrypt.DefaultCost)
+	createUser := domain.User{
+		Name:     request.Name,
+		Age:      request.Age,
+		Email:    request.Email,
+		Password: string(password),
+	}
+	user, err := service.UserRepository.Save(ctx, tx, createUser)
+	if err != nil {
+		return web.UserResponse{}, err
+	}
+
+	return helper.ToUserResponse(user), nil
 }
 
-func (u UserServiceImpl) Update(ctx context.Context, request web.UserUpdateRequest) (web.UserResponse, error) {
-	//TODO implement me
-	panic("implement me")
+func (service UserServiceImpl) Update(ctx context.Context, request web.UserUpdateRequest) (web.UserResponse, error) {
+	err := service.Validate.Struct(request)
+	if err != nil {
+		return web.UserResponse{}, err
+	}
+
+	tx, err := service.DB.Begin()
+	if err != nil {
+		return web.UserResponse{}, err
+	}
+	defer helper.CommitOrRollback(tx)
+
+	getUser, err := service.UserRepository.FindById(ctx, tx, request.Id)
+	if err != nil {
+		return web.UserResponse{}, err
+	}
+
+	getUser.Name = request.Name
+	getUser.Age = request.Age
+	getUser.Email = request.Email
+
+	user, err := service.UserRepository.Update(ctx, tx, getUser)
+	if err != nil {
+		return web.UserResponse{}, err
+	}
+
+	return helper.ToUserResponse(user), nil
 }
 
-func (u UserServiceImpl) Delete(ctx context.Context, userId int) error {
-	//TODO implement me
-	panic("implement me")
+func (service UserServiceImpl) Delete(ctx context.Context, userId int) error {
+	tx, err := service.DB.Begin()
+	if err != nil {
+		return err
+	}
+	defer helper.CommitOrRollback(tx)
+
+	getUser, err := service.UserRepository.FindById(ctx, tx, userId)
+	if err != nil {
+		return err
+	}
+
+	err = service.UserRepository.Delete(ctx, tx, getUser)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

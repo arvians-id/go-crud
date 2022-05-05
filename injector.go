@@ -24,11 +24,21 @@ var postSet = wire.NewSet(
 	wire.Bind(new(controller.PostController), new(*controller.PostControllerImpl)),
 )
 
+var userSet = wire.NewSet(
+	repository.NewUserRepositoryImpl,
+	wire.Bind(new(repository.UserRepository), new(*repository.UserRepositoryImpl)),
+	service.NewUserServiceImpl,
+	wire.Bind(new(service.UserService), new(*service.UserServiceImpl)),
+	controller.NewUserControllerImpl,
+	wire.Bind(new(controller.UserController), new(*controller.UserControllerImpl)),
+)
+
 func InitializedServer() *http.Server {
 	wire.Build(
 		app.NewDB,
 		validator.New,
 		postSet,
+		userSet,
 		app.NewRouter,
 		wire.Bind(new(http.Handler), new(*httprouter.Router)),
 		middleware.NewAuthMiddleware,

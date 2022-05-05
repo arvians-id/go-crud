@@ -29,7 +29,10 @@ func InitializedServer() *http.Server {
 	validate := validator.New()
 	postServiceImpl := service.NewPostServiceImpl(postRepositoryImpl, db, validate)
 	postControllerImpl := controller.NewPostControllerImpl(postServiceImpl)
-	router := app.NewRouter(postControllerImpl)
+	userRepositoryImpl := repository.NewUserRepositoryImpl()
+	userServiceImpl := service.NewUserServiceImpl(userRepositoryImpl, db, validate)
+	userControllerImpl := controller.NewUserControllerImpl(userServiceImpl)
+	router := app.NewRouter(postControllerImpl, userControllerImpl)
 	authMiddleware := middleware.NewAuthMiddleware(router)
 	server := NewServer(authMiddleware)
 	return server
@@ -38,3 +41,5 @@ func InitializedServer() *http.Server {
 // injector.go:
 
 var postSet = wire.NewSet(repository.NewPostRepositoryImpl, wire.Bind(new(repository.PostRepository), new(*repository.PostRepositoryImpl)), service.NewPostServiceImpl, wire.Bind(new(service.PostService), new(*service.PostServiceImpl)), controller.NewPostControllerImpl, wire.Bind(new(controller.PostController), new(*controller.PostControllerImpl)))
+
+var userSet = wire.NewSet(repository.NewUserRepositoryImpl, wire.Bind(new(repository.UserRepository), new(*repository.UserRepositoryImpl)), service.NewUserServiceImpl, wire.Bind(new(service.UserService), new(*service.UserServiceImpl)), controller.NewUserControllerImpl, wire.Bind(new(controller.UserController), new(*controller.UserControllerImpl)))

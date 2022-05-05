@@ -12,3 +12,12 @@ func ToPostResponse(post domain.Post) web.PostResponse {
 		Description: post.Description,
 	}
 }
+
+func ToUserResponse(user domain.User) web.UserResponse {
+	return web.UserResponse{
+		Id:    user.Id,
+		Name:  user.Name,
+		Age:   user.Age,
+		Email: user.Email,
+	}
+}
