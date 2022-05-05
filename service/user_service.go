@@ -81,6 +81,7 @@ func (service UserServiceImpl) Create(ctx context.Context, request web.UserCreat
 		Name:     request.Name,
 		Age:      request.Age,
 		Email:    request.Email,
+		Image:    request.Image,
 		Password: string(password),
 	}
 	user, err := service.UserRepository.Save(ctx, tx, createUser)
@@ -111,6 +112,7 @@ func (service UserServiceImpl) Update(ctx context.Context, request web.UserUpdat
 	getUser.Name = request.Name
 	getUser.Age = request.Age
 	getUser.Email = request.Email
+	getUser.Image = request.Image
 
 	user, err := service.UserRepository.Update(ctx, tx, getUser)
 	if err != nil {

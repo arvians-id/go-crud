@@ -38,7 +38,7 @@ func (repository UserRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) ([
 	var users []domain.User
 	for queryContext.Next() {
 		var user domain.User
-		err := queryContext.Scan(&user.Id, &user.Name, &user.Age, &user.Email, &user.Password)
+		err := queryContext.Scan(&user.Id, &user.Name, &user.Age, &user.Email, &user.Image, &user.Password)
 		if err != nil {
 			return []domain.User{}, err
 		}
@@ -63,7 +63,7 @@ func (repository UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, u
 
 	var user domain.User
 	if queryContext.Next() {
-		err := queryContext.Scan(&user.Id, &user.Name, &user.Age, &user.Email, &user.Password)
+		err := queryContext.Scan(&user.Id, &user.Name, &user.Age, &user.Email, &user.Image, &user.Password)
 		if err != nil {
 			return domain.User{}, err
 		}
@@ -75,8 +75,8 @@ func (repository UserRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, u
 }
 
 func (repository UserRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, user domain.User) (domain.User, error) {
-	query := "INSERT INTO user (name,age,email,password) VALUES(?,?,?,?)"
-	execContext, err := tx.ExecContext(ctx, query, user.Name, user.Age, user.Email, user.Password)
+	query := "INSERT INTO users (name,age,email,image,password) VALUES(?,?,?,?,?)"
+	execContext, err := tx.ExecContext(ctx, query, user.Name, user.Age, user.Email, user.Image, user.Password)
 	if err != nil {
 		return domain.User{}, err
 	}
@@ -92,8 +92,8 @@ func (repository UserRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, user 
 }
 
 func (repository UserRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, user domain.User) (domain.User, error) {
-	query := "UPDATE user SET name = ?, age = ?, email = ? WHERE id = ?"
-	_, err := tx.ExecContext(ctx, query, user.Name, user.Age, user.Email, user.Id)
+	query := "UPDATE users SET name = ?, age = ?, email = ?, image = ? WHERE id = ?"
+	_, err := tx.ExecContext(ctx, query, user.Name, user.Age, user.Email, user.Image, user.Id)
 	if err != nil {
 		return domain.User{}, err
 	}

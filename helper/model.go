@@ -19,5 +19,6 @@ func ToUserResponse(user domain.User) web.UserResponse {
 		Name:  user.Name,
 		Age:   user.Age,
 		Email: user.Email,
+		Image: user.Image,
 	}
 }
