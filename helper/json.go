@@ -6,14 +6,17 @@ import (
 	"net/http"
 )
 
-func ReadFromRequestBody(r *http.Request, request interface{}) {
-	err := json.NewDecoder(r.Body).Decode(request)
-	PanicIfError(err)
+func ReadFromRequestBody(r *http.Request, request interface{}) error {
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(request)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func WriteToResponseBody(w http.ResponseWriter, code int, data interface{}) {
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
 
 	response := web.WebResponse{
 		Code:   code,

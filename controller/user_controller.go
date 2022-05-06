@@ -53,37 +53,27 @@ func (controller UserControllerImpl) FindById(w http.ResponseWriter, r *http.Req
 }
 
 func (controller UserControllerImpl) Create(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	var userRequest web.UserCreateRequest
-	helper.ReadFromRequestBody(r, &userRequest)
+	// File Upload
+	filename, err := helper.UploadImage(r, 1, "assets/images")
+	if err != nil {
+		helper.WriteToResponseBody(w, http.StatusInternalServerError, err.Error())
+		return
+	}
 
-	//uploadedFile, header, err := r.FormFile("image")
-	//if err != nil {
-	//	helper.WriteToResponseBody(w, http.StatusInternalServerError, err.Error())
-	//	return
-	//}
-	//defer uploadedFile.Close()
-	//filename := header.Filename
-	//
-	//dir, err := os.Getwd()
-	//if err != nil {
-	//	helper.WriteToResponseBody(w, http.StatusInternalServerError, err.Error())
-	//	return
-	//}
-	//fileLocation := filepath.Join(dir, "assets/image", filename)
-	//targetFile, err := os.OpenFile(fileLocation, os.O_WRONLY|os.O_CREATE, 0666)
-	//if err != nil {
-	//	helper.WriteToResponseBody(w, http.StatusInternalServerError, err.Error())
-	//	return
-	//}
-	//defer targetFile.Close()
-	//
-	//_, err = io.Copy(targetFile, uploadedFile)
-	//if err != nil {
-	//	helper.WriteToResponseBody(w, http.StatusInternalServerError, err.Error())
-	//	return
-	//}
-	//
-	//userRequest.Image = filename
+	// User Request
+	age, err := strconv.Atoi(r.PostFormValue("age"))
+	if err != nil {
+		helper.WriteToResponseBody(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	userRequest := web.UserCreateRequest{
+		Name:     r.PostFormValue("name"),
+		Age:      age,
+		Email:    r.PostFormValue("email"),
+		Image:    filename,
+		Password: r.PostFormValue("password"),
+	}
 
 	user, err := controller.UserService.Create(r.Context(), userRequest)
 	if err != nil {
@@ -94,8 +84,19 @@ func (controller UserControllerImpl) Create(w http.ResponseWriter, r *http.Reque
 }
 
 func (controller UserControllerImpl) Update(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
-	var userRequest web.UserUpdateRequest
-	helper.ReadFromRequestBody(r, &userRequest)
+	// File Upload
+	filename, err := helper.UploadImage(r, 1, "assets/images")
+	if err != nil {
+		helper.WriteToResponseBody(w, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	// User Request
+	age, err := strconv.Atoi(r.FormValue("age"))
+	if err != nil {
+		helper.WriteToResponseBody(w, http.StatusInternalServerError, err.Error())
+		return
+	}
 
 	getParams := params.ByName("userId")
 	id, err := strconv.Atoi(getParams)
@@ -104,7 +105,13 @@ func (controller UserControllerImpl) Update(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	userRequest.Id = id
+	userRequest := web.UserUpdateRequest{
+		Id:    id,
+		Name:  r.FormValue("name"),
+		Age:   age,
+		Email: r.FormValue("email"),
+		Image: filename,
+	}
 
 	user, err := controller.UserService.Update(r.Context(), userRequest)
 	if err != nil {
