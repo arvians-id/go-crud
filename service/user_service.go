@@ -109,14 +109,24 @@ func (service UserServiceImpl) Update(ctx context.Context, request web.UserUpdat
 		return web.UserResponse{}, err
 	}
 
+	newImage := request.Image
+	oldImage := getUser.Image
+	if newImage == "" {
+		newImage = getUser.Image
+	}
+
 	getUser.Name = request.Name
 	getUser.Age = request.Age
 	getUser.Email = request.Email
-	getUser.Image = request.Image
+	getUser.Image = newImage
 
 	user, err := service.UserRepository.Update(ctx, tx, getUser)
 	if err != nil {
 		return web.UserResponse{}, err
+	}
+
+	if newImage != "" {
+		_ = helper.DeleteImage("assets/images", oldImage)
 	}
 
 	return helper.ToUserResponse(user), nil
@@ -133,6 +143,8 @@ func (service UserServiceImpl) Delete(ctx context.Context, userId int) error {
 	if err != nil {
 		return err
 	}
+
+	_ = helper.DeleteImage("assets/images", getUser.Image)
 
 	err = service.UserRepository.Delete(ctx, tx, getUser)
 	if err != nil {

@@ -54,7 +54,8 @@ func (controller UserControllerImpl) FindById(w http.ResponseWriter, r *http.Req
 
 func (controller UserControllerImpl) Create(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	// File Upload
-	filename, err := helper.UploadImage(r, 1, "assets/images")
+	path := "assets/images"
+	filename, err := helper.UploadImage(r, 1, path)
 	if err != nil {
 		helper.WriteToResponseBody(w, http.StatusInternalServerError, err.Error())
 		return
@@ -77,6 +78,7 @@ func (controller UserControllerImpl) Create(w http.ResponseWriter, r *http.Reque
 
 	user, err := controller.UserService.Create(r.Context(), userRequest)
 	if err != nil {
+		_ = helper.DeleteImage(path, filename)
 		helper.WriteToResponseBody(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -85,10 +87,16 @@ func (controller UserControllerImpl) Create(w http.ResponseWriter, r *http.Reque
 
 func (controller UserControllerImpl) Update(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 	// File Upload
-	filename, err := helper.UploadImage(r, 1, "assets/images")
-	if err != nil {
-		helper.WriteToResponseBody(w, http.StatusInternalServerError, err.Error())
-		return
+	_, _, err := r.FormFile("image")
+	var filename string
+	path := "assets/images"
+	// Is File Exists
+	if err == nil {
+		filename, err = helper.UploadImage(r, 1, path)
+		if err != nil {
+			helper.WriteToResponseBody(w, http.StatusInternalServerError, err.Error())
+			return
+		}
 	}
 
 	// User Request
@@ -115,6 +123,7 @@ func (controller UserControllerImpl) Update(w http.ResponseWriter, r *http.Reque
 
 	user, err := controller.UserService.Update(r.Context(), userRequest)
 	if err != nil {
+		_ = helper.DeleteImage(path, filename)
 		helper.WriteToResponseBody(w, http.StatusInternalServerError, err.Error())
 		return
 	}

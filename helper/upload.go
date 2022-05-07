@@ -62,3 +62,18 @@ func UploadImage(r *http.Request, maxSize int, path string) (string, error) {
 
 	return filename, nil
 }
+
+func DeleteImage(path string, filename string) error {
+	dir, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	fileLocation := filepath.Join(dir, path, filename)
+	err = os.Remove(fileLocation)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
